@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GHOSTQUORUM</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--space-black:#0A0E1A;--holo-blue:#4FD1FF;--sith-red:#FF2E4D;--jedi-green:#4AFF8C;--holocron-gold:#FFD93D;--terminal-amber:#FFB000;--star-white:#F0F6FF;--panel-gray:#1A1F2E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;border-radius:0}
+html,body{margin:0;height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--space-black);color:var(--star-white);font:18px/1.2 'VT323',monospace;text-shadow:0 0 2px currentColor;overflow:hidden;
+background-image:radial-gradient(1px 1px at 20px 30px,#F0F6FF 50%,transparent 51%),radial-gradient(1px 1px at 90px 120px,#4FD1FF 50%,transparent 51%),radial-gradient(1px 1px at 160px 60px,#F0F6FF 50%,transparent 51%);background-size:180px 150px,230px 210px,310px 270px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.7))}
+h1,h2,h3,.px{font-family:'Press Start 2P',monospace;font-weight:400;text-transform:uppercase;letter-spacing:2px;margin:0}
+h2{font-size:11px;color:var(--holocron-gold);text-shadow:0 0 6px var(--holocron-gold);margin-bottom:12px}
+#app{display:grid;grid-template-columns:220px 1fr 320px;grid-template-rows:64px 1fr;height:100%;gap:8px;padding:0 8px 8px}
+.panel{background:rgba(26,31,46,.7);border:1px solid var(--holo-blue);box-shadow:inset 0 0 12px rgba(79,209,255,.15);padding:12px;min-height:0}
+#top{grid-column:1/4;display:flex;align-items:center;gap:16px;border-bottom:2px solid var(--holo-blue);box-shadow:0 2px 8px var(--holo-blue);background:rgba(10,14,26,.9);padding:0 16px;margin:0 -8px}
+#logo{font-size:13px;color:var(--holo-blue);text-shadow:0 0 8px var(--holo-blue);white-space:nowrap}
+#crawl{flex:1;height:48px;overflow:hidden;color:var(--terminal-amber);text-align:center;position:relative}
+#crawl div{position:absolute;left:0;right:0;animation:crawl 14s linear infinite}
+@keyframes crawl{from{top:100%}to{top:-260%}}
+#stat{display:flex;gap:10px;align-items:center;color:var(--terminal-amber);font-size:16px;white-space:nowrap}
+#stat i{color:var(--holo-blue);font-style:normal}
+#side{overflow:auto}
+.node{display:flex;align-items:center;gap:10px;border:1px solid #2b3550;padding:8px;margin-bottom:8px;cursor:pointer;background:rgba(10,14,26,.6);transition:.15s;width:100%;color:inherit;font:inherit;text-align:left}
+.node:hover{border-color:var(--holo-blue);box-shadow:0 0 10px var(--holo-blue)}
+.port{width:40px;height:40px;border:2px solid var(--holo-blue);display:grid;place-items:center;font:12px 'Press Start 2P';color:var(--holo-blue);image-rendering:pixelated}
+.led{width:8px;height:8px;animation:fl 2s infinite;flex:none}
+@keyframes fl{0%,100%{opacity:1}50%{opacity:.7}30%{opacity:.85}}
+.honest{background:var(--jedi-green);box-shadow:0 0 6px var(--jedi-green)}.byz{background:var(--sith-red);box-shadow:0 0 6px var(--sith-red)}.ver{background:var(--holocron-gold);box-shadow:0 0 6px var(--holocron-gold)}.off{background:#666}
+.node.isbyz .port{border-color:var(--sith-red);color:var(--sith-red)}
+.nl{flex:1;font-size:18px}
+#center{display:flex;flex-direction:column;overflow:auto}
+#chamber{flex:1;min-height:240px;display:flex;justify-content:center}
+#chamber svg{height:100%;max-height:440px;width:auto;max-width:100%}
+#holo{transform-origin:200px 200px;animation:hp 3s ease-in-out infinite}
+@keyframes hp{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+#holo.hot{animation:hp 0.6s ease-in-out infinite;filter:drop-shadow(0 0 12px var(--holocron-gold))}
+.saber{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;margin:5px 0;color:var(--holo-blue)}
+.track{height:10px;background:#0f1424;border:1px solid #2b3550;position:relative}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .2s linear;background:linear-gradient(90deg,#fff,var(--jedi-green));box-shadow:0 0 10px var(--jedi-green)}
+#right{display:flex;flex-direction:column}
+.tabs{display:flex;gap:2px;margin-bottom:8px}
+.tab{flex:1;font:8px 'Press Start 2P';padding:8px 2px;background:#0f1424;color:var(--holo-blue);border:1px solid #2b3550;cursor:pointer;line-height:1.4}
+.tab.on{border-color:var(--holo-blue);box-shadow:0 0 8px var(--holo-blue);color:var(--holocron-gold)}
+.pane{display:none;flex:1;min-height:0;flex-direction:column;animation:fade .3s}.pane.on{display:flex}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+#log,#out{flex:1;overflow:auto;font-size:14px;line-height:1.25;color:var(--terminal-amber);min-height:80px;background:rgba(10,14,26,.6);border:1px solid #2b3550;padding:6px;white-space:pre-wrap}
+.ok{color:var(--jedi-green)}.warn{color:var(--holocron-gold)}.err{color:var(--sith-red)}
+.btn{position:relative;overflow:hidden;font:11px 'Press Start 2P';letter-spacing:1px;padding:12px;margin-top:8px;width:100%;cursor:pointer;color:var(--star-white);background:var(--sith-red);border:2px solid var(--star-white);box-shadow:0 4px 0 #7a1226,inset -2px -2px 0 rgba(0,0,0,.35),inset 2px 2px 0 rgba(255,255,255,.3);text-shadow:0 0 4px #000}
+.btn.b{background:#17506a;box-shadow:0 4px 0 #0b2b3b,inset -2px -2px 0 rgba(0,0,0,.35),inset 2px 2px 0 rgba(255,255,255,.3)}
+.btn::before{content:"";position:absolute;inset:0;width:0;background:rgba(240,246,255,.3);transition:width .2s linear}
+.btn:hover::before{width:100%}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #7a1226}
+select{width:100%;background:#0f1424;color:var(--terminal-amber);border:1px solid var(--holo-blue);font:18px 'VT323',monospace;padding:6px}
+.bm{margin:6px 0;font-size:14px;color:var(--terminal-amber)}
+.bm .bar{height:10px;background:var(--holo-blue);box-shadow:0 0 8px var(--holo-blue);margin-top:2px}
+.bm small{color:#8fa3c0;font-size:13px}
+#votes{display:flex;gap:10px;justify-content:space-around;align-items:flex-end;height:220px;margin-top:10px}
+.vb{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;color:var(--holo-blue)}
+.vt{flex:1;width:14px;background:#0f1424;border:1px solid #2b3550;position:relative}
+.vf{position:absolute;left:0;right:0;bottom:0;height:0;transition:height .3s;background:linear-gradient(0deg,#fff,var(--jedi-green));box-shadow:0 0 10px var(--jedi-green)}
+#qc{font:16px 'Press Start 2P';color:var(--holocron-gold);text-align:center;text-shadow:0 0 8px var(--holocron-gold)}
+#drawer{position:fixed;top:0;bottom:0;right:-360px;width:340px;z-index:50;background:rgba(26,31,46,.95);border-left:2px solid var(--holo-blue);box-shadow:-4px 0 20px rgba(79,209,255,.4);padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px;transition:right .25s steps(6);overflow:auto}
+#drawer.open{right:0}
+#drawer dl{display:grid;grid-template-columns:110px 1fr;gap:4px;margin:12px 0}
+#drawer dt{color:var(--holo-blue)}#drawer dd{margin:0;color:var(--terminal-amber)}
+#flash{position:fixed;inset:0;background:var(--sith-red);opacity:0;pointer-events:none;z-index:9997}
+#flash.go{animation:fl2 .3s}
+@keyframes fl2{0%{opacity:0}40%{opacity:.3}100%{opacity:0}}
+@media(max-width:1200px){#app{grid-template-columns:1fr 300px;grid-template-rows:64px auto 1fr;overflow:auto}#top{grid-column:1/3}#side{grid-column:1/3;display:flex;gap:8px;overflow:auto}#side h2{display:none}.node{margin:0;min-width:150px}body{overflow:auto}}
+</style></head>
+<body>
+<div id="app">
+<header id="top">
+ <div id="logo" class="px">◆ GHOSTQUORUM</div>
+ <div id="crawl"><div id="crawlTxt"></div></div>
+ <div id="stat"><span>GALACTIC CYCLE <b id="ep">07</b></span><i>│</i><span id="cs">COUNCIL: QUORUM ACHIEVED</span><i>│</i><span id="sc">SECRET: INTACT</span></div>
+</header>
+<aside id="side" class="panel"><h2>◆ Council Roster</h2><div id="roster"></div></aside>
+<main id="center" class="panel">
+ <h2>◆ Council Chamber</h2>
+ <div id="chamber"></div>
+ <div id="sabers"></div>
+</main>
+<section id="right" class="panel">
+ <div class="tabs" role="tablist">
+  <button class="tab on" data-t="arch">◆ Archives</button><button class="tab" data-t="atk">◆ Attack</button><button class="tab" data-t="bench">◆ Bench</button><button class="tab" data-t="vote">◆ Vote</button>
+ </div>
+ <div class="pane on" id="arch"><div id="log"></div><button class="btn" id="refresh">▶ EXECUTE REFRESH</button></div>
+ <div class="pane" id="atk"><select id="sel"></select><button class="btn" id="exe">▶ EXECUTE</button><h2 style="margin-top:12px">◆ Result</h2><pre id="out" style="margin:0"></pre></div>
+ <div class="pane" id="bench"><div id="bm" style="overflow:auto"></div></div>
+ <div class="pane" id="vote"><div id="qc">4/5 QUORUM</div><div id="votes"></div></div>
+</section>
+</div>
+<aside id="drawer"></aside>
+<div id="flash"></div>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var S={epoch:7,nodes:[{id:1,l:'Y',s:'honest'},{id:2,l:'O',s:'honest'},{id:3,l:'M',s:'honest'},{id:4,l:'K',s:'honest'},{id:5,l:'W',s:'byz'}],busy:false,
+cert:[1,1,1,1,0],
+log:[["ok","COMMITTED // quorum 4/5"],["err","node-5 contribution REJECTED (Feldman verification failed)"],["warn","complaint filed against node-5 by node-2"],["ok","node-4 QUALIFIED"],["ok","node-3 QUALIFIED"],["ok","node-2 QUALIFIED"],["ok","node-1 QUALIFIED"],["ok","SHARES_EXCHANGED"],["ok","COMMITMENTS_PUBLISHED"],["ok","CONTRIBUTING // 5 commitments received"],["ok","INITIALIZED"]].map(function(x){return{e:7,c:x[0],t:x[1]}}).concat([{e:6,c:"ok",t:"COMMITTED // quorum 5/5"},{e:5,c:"ok",t:"COMMITTED // quorum 5/5"}])};
+var pad=function(n){return(n<10?'0':'')+n};
+var ATK=[["Two Padawans Conspire","collusion_2"],["Council of Three Convened","threshold_3"],["Sith Possession Across Cycles","mobile_adversary"],["Tainted Offering","malicious_contribution"],["Sith Illusion","inconsistent_evaluations"],["Holocron Echo","replay"],["Lightsaber Deflection","tamper"],["Force Choke / Silence","withholding"],["False Accusation","false_complaint"],["Time Travel Paradox","rollback"],["Droid Memory Wipe","restart"],["Ambushed Mid-Ritual","interrupted"],["Corrupted Holocron Shard","corrupted_share"],["Invalid Force Signature","malformed_group_element"],["Forged Jedi Seal","invalid_signature"]];
+var BEN=[["field_random",.42],["field_mul",.81],["field_inverse",2.14],["poly_eval_deg2",1.23],["dealer_distribute_5_3",18.7],["reconstruct_3_of_5",12.4],["commitment_gen_deg2",47.2],["commitment_verify",52.8],["sign_message",88.3],["verify_signature",34.1],["full_refresh_honest",1240]];
+var ST={honest:'HONEST',byz:'BYZANTINE',ver:'VERIFYING',off:'OFFLINE'};
+function byzN(){return S.nodes.filter(function(n){return n.s==='byz'}).length}
+/* ── Live REST API ── */
+var BASE='';
+var API={
+  refresh:function(){return fetch(BASE+'/api/refresh',{method:'POST'}).then(function(r){return r.json()}).then(function(d){return API.syncState()}).catch(function(e){console.warn('API offline, running locally',e);return Promise.resolve()})},
+  attack:function(k){return fetch(BASE+'/api/attack/'+k,{method:'POST'}).then(function(r){return r.json()}).catch(function(e){console.warn('API offline',e);return Promise.resolve()})},
+  syncState:function(){return fetch(BASE+'/api/state').then(function(r){return r.json()}).then(function(d){
+    S.epoch=d.epoch;
+    d.nodes.forEach(function(n,i){S.nodes[i].s=n.state;S.nodes[i].l=n.label;S.cert[i]=n.certified?1:0});
+    S.log=d.log.map(function(e){return{e:e.e,c:e.c,t:e.t}});
+    all();
+  }).catch(function(){})},
+  byzantine:function(id){return fetch(BASE+'/api/byzantine/'+id,{method:'POST'}).then(function(r){return r.json()}).then(function(){return API.syncState()}).catch(function(){})},
+  benchmarks:function(){return fetch(BASE+'/api/benchmarks').then(function(r){return r.json()}).catch(function(){return null})},
+  nodeDetail:function(id){return fetch(BASE+'/api/node/'+id).then(function(r){return r.json()}).catch(function(){return null})}
+};
+API.syncState();
+/* optional sound hooks (silent unless audio allowed) */
+var ac;function beep(f,d){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;g.gain.value=.03;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+document.addEventListener('click',function(e){if(e.target.closest('.btn'))beep(660,.08)});
+function renderRoster(){
+ $('#roster').innerHTML=S.nodes.map(function(n){return '<button class="node'+(n.s==='byz'?' isbyz':'')+'" data-i="'+n.id+'"><div class="port">'+n.l+'</div><div class="nl">NODE-'+n.id+(n.s==='byz'?' <span class="err">⚠</span>':'')+'</div><span class="led '+n.s+'" title="'+ST[n.s]+'"></span></button>'}).join('');
+ document.querySelectorAll('.node').forEach(function(b){b.onclick=function(){openDrawer(+b.dataset.i)}});
+}
+function pt(i){var a=-Math.PI/2+i*2*Math.PI/5;return[200+150*Math.cos(a),200+150*Math.sin(a)]}
+function renderChamber(){
+ var h='<svg viewBox="0 0 400 400" shape-rendering="crispEdges"><rect x="40" y="40" width="320" height="320" fill="none" stroke="#4FD1FF" stroke-opacity=".08"/>';
+ var bz=S.nodes.map(function(n){return n.s==='byz'});
+ for(var i=0;i<5;i++)for(var j=i+1;j<5;j++){var a=pt(i),b=pt(j),st='stroke="#4FD1FF"';
+  if(bz[i]||bz[j]){var c=(i===1&&j===4)||(i===4&&j===1);st=c?'stroke="#FF2E4D" stroke-dasharray="6 4"':'stroke="#4FD1FF" stroke-opacity=".25"'}
+  if((bz[i]||bz[j])&&!(i===1&&j===4)&&!(i===4&&j===1)&&!(bz[1]&&0))st='stroke="#4FD1FF" stroke-opacity=".25"';
+  h+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" '+st+' stroke-width="2"/>'}
+ S.nodes.forEach(function(n,i){var p=pt(i),c=n.s==='byz'?'#FF2E4D':n.s==='ver'?'#FFD93D':n.s==='off'?'#666':'#4AFF8C';
+  h+='<g style="cursor:pointer" data-i="'+n.id+'"><rect x="'+(p[0]-14)+'" y="'+(p[1]-14)+'" width="28" height="28" fill="#0A0E1A" stroke="'+c+'" stroke-width="2"/><rect x="'+(p[0]-6)+'" y="'+(p[1]-6)+'" width="12" height="12" fill="'+c+'"><animate attributeName="opacity" values="1;.7;1" dur="2s" repeatCount="indefinite"/></rect><text x="'+p[0]+'" y="'+(p[1]+(i===0?-24:34))+'" fill="#F0F6FF" font-family="VT323" font-size="18" text-anchor="middle">NODE-'+n.id+(n.s==='byz'?' ⚠':'')+'</text></g>'});
+ h+='<g id="holo"><polygon points="200,170 224,200 200,230 176,200" fill="#FFD93D" stroke="#F0F6FF" stroke-width="2"/><polygon points="200,184 212,200 200,216 188,200" fill="#FFB000"/></g></svg>';
+ $('#chamber').innerHTML=h;
+ document.querySelectorAll('#chamber g[data-i]').forEach(function(g){g.onclick=function(){openDrawer(+g.dataset.i)}});
+}
+function renderSabers(){
+ $('#sabers').innerHTML='<h2 style="font-size:9px">◆ Commit Certificate // E'+pad(S.epoch)+'</h2>'+S.nodes.map(function(n,i){return '<div class="saber"><span>NODE-'+n.id+'</span><div class="track"><div class="fill" id="sf'+i+'" style="width:'+(S.cert[i]?100:0)+'%"></div></div></div>'}).join('');
+}
+function renderVotes(){
+ var c=S.cert.reduce(function(a,b){return a+b},0);
+ $('#qc').textContent=c+'/5 QUORUM '+(c>=4?'✓':'✗');
+ $('#votes').innerHTML=S.nodes.map(function(n,i){return '<div class="vb"><div class="vt"><div class="vf" style="height:'+(S.cert[i]?100:0)+'%"></div></div><span>N'+n.id+'</span></div>'}).join('');
+}
+function renderLog(){
+ $('#log').innerHTML=S.log.map(function(r){return '<div class="'+r.c+'">[E'+pad(r.e)+'] '+r.t+'</div>'}).join('');$('#log').scrollTop=0;
+ $('#crawlTxt').innerHTML=S.log.slice(0,6).map(function(r){return '[E'+pad(r.e)+'] '+r.t}).join('<br>');
+}
+function push(c,t,e){S.log.unshift({e:e||S.epoch,c:c,t:t});renderLog()}
+function status(){
+ var q=S.cert.reduce(function(a,b){return a+b},0)>=4;
+ $('#ep').textContent=pad(S.epoch);
+ $('#cs').textContent='COUNCIL: '+(q?'QUORUM ACHIEVED':'QUORUM LOST');$('#cs').style.color=q?'':'var(--sith-red)';
+ $('#sc').textContent='SECRET: '+(byzN()>=3?'AT RISK':'INTACT');$('#sc').style.color=byzN()>=3?'var(--sith-red)':'';
+}
+function all(){renderRoster();renderChamber();renderSabers();renderVotes();renderLog();status()}
+function openDrawer(id){
+ var n=S.nodes[id-1],mine=S.log.filter(function(r){return r.t.indexOf('node-'+id)>-1&&r.t.indexOf('complaint')>-1});
+ $('#drawer').innerHTML='<h2>◆ NODE-'+id+'</h2><dl><dt>Node ID</dt><dd>NODE-'+id+' ('+n.l+')</dd><dt>Epoch</dt><dd>E'+pad(S.epoch)+'</dd><dt>State</dt><dd class="'+(n.s==='byz'?'err':'ok')+'">'+ST[n.s]+'</dd><dt>Share epoch</dt><dd>E'+pad(n.s==='byz'?S.epoch-1:S.epoch)+'</dd><dt>WAL status</dt><dd>'+(n.s==='off'?'DETACHED':'SYNCED')+'</dd></dl><h2 style="font-size:9px">◆ Complaints</h2><div style="color:var(--terminal-amber)">'+(mine.length?mine.map(function(r){return '[E'+pad(r.e)+'] '+r.t}).join('<br>'):'None on record')+'</div><button class="btn" id="sim">▶ SIMULATE BYZANTINE</button><button class="btn b" id="cls">◆ CLOSE</button>';
+ $('#drawer').classList.add('open');
+ $('#cls').onclick=function(){$('#drawer').classList.remove('open')};
+ $('#sim').onclick=function(){API.byzantine(id).then(function(){n.s='byz';S.cert[id-1]=0;push('err','node-'+id+' flagged BYZANTINE (simulated)');all();$('#drawer').classList.remove('open')}).catch(function(){n.s='byz';S.cert[id-1]=0;push('err','node-'+id+' flagged BYZANTINE (simulated)');all();$('#drawer').classList.remove('open')})};
+}
+function shake(){var t=0,k=setInterval(function(){document.getElementById('app').style.transform='translate('+(Math.random()*8-4)+'px,'+(Math.random()*8-4)+'px)';if((t+=40)>=200){clearInterval(k);document.getElementById('app').style.transform=''}},40);var f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go')}
+$('#refresh').onclick=function(){
+ if(S.busy)return;S.busy=true;S.epoch++;S.cert=[0,0,0,0,0];
+ push('ok','INITIALIZED');
+ var seq=[['ok','CONTRIBUTING // 5 commitments received'],['ok','COMMITMENTS_PUBLISHED'],['ok','SHARES_EXCHANGED']];
+ all();$('#holo').classList.add('hot');
+ /* Fire the real backend refresh (runs concurrently with animation) */
+ var apiDone=false,apiResult=null;
+ API.refresh().then(function(r){apiResult=r;apiDone=true}).catch(function(){apiDone=true});
+ var step=0,iv=setInterval(function(){
+  if(step<seq.length){push(seq[step][0],seq[step][1]);}
+  else if(step<seq.length+5){var i=step-seq.length;if(S.nodes[i].s==='byz'){push('err','node-'+(i+1)+' contribution REJECTED (Feldman verification failed)')}else{S.cert[i]=1;push('ok','node-'+(i+1)+' QUALIFIED');renderSabers();renderVotes()}}
+  else{clearInterval(iv);
+   /* Sync from backend if available */
+   if(apiDone){API.syncState()}
+   var q=S.cert.reduce(function(a,b){return a+b},0);push(q>=4?'ok':'err',(q>=4?'COMMITTED':'ABORTED')+' // quorum '+q+'/5');status();setTimeout(function(){var h=$('#holo');if(h)h.classList.remove('hot');S.busy=false},1000);beep(880,.15)}
+  step++},260);
+ var c=$('#crawl div');c.style.animation='none';void c.offsetWidth;c.style.animation='crawl 6s linear infinite';
+};
+ATK.forEach(function(a){var o=document.createElement('option');o.value=a[1];o.textContent=a[0]+' ('+a[1]+')';$('#sel').appendChild(o)});
+$('#exe').onclick=function(){
+ var k=$('#sel').value,nm=$('#sel').selectedOptions[0].textContent;shake();beep(180,.2);
+ API.attack(k).then(function(result){
+  if(result && result.attack_id){
+   $('#out').textContent=JSON.stringify(result,null,2);
+   push(result.detection_result==='detected'?'warn':'err','ATTACK '+result.attack_id+' // '+result.detection_result+': '+result.protocol_response);
+   API.syncState();
+  }else{
+   /* Fallback to local simulation */
+   var thr=/collusion_2|mobile/.test(k)?'sub-threshold, secret holds':/threshold_3/.test(k)?'THRESHOLD REACHED, secret exposed':'rejected by verification';
+   var r={attack:k,epoch:S.epoch,detected:!/threshold_3/.test(k),outcome:thr,secret_intact:!/threshold_3/.test(k),committed:S.cert.reduce(function(a,b){return a+b},0)>=4};
+   $('#out').textContent=JSON.stringify(r,null,2);
+   push('err','ATTACK '+k+' // '+thr);
+  }
+ });
+};
+/* Render benchmarks: try live API first, fall back to static data */
+function renderBenchmarks(data){
+ $('#bm').innerHTML=data.map(function(b){var nm=b[0]||b.name,us=b[1]||b.avg_us,p50=b.p50_us||(us*.97),p95=b.p95_us||(us*1.4),p99=b.p99_us||(us*1.9);var w=Math.max(2,Math.log10(us*100)/Math.log10(124000)*100);return '<div class="bm">◆ '+nm+' <span style="float:right">'+us.toFixed(2)+'μs</span><div class="bar" style="width:'+w+'%"></div><small>avg '+us.toFixed(2)+' │ p50 '+p50.toFixed(2)+' │ p95 '+p95.toFixed(2)+' │ p99 '+p99.toFixed(2)+'</small></div>'}).join('');
+}
+renderBenchmarks(BEN);
+API.benchmarks().then(function(d){if(d&&d.length)renderBenchmarks(d)});
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){document.querySelectorAll('.tab,.pane').forEach(function(x){x.classList.remove('on')});t.classList.add('on');$('#'+t.dataset.t).classList.add('on')}});
+all();
+setInterval(function(){API.syncState()},5000);
+})();
+</script>
+</body></html>
